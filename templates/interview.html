@@ -1,0 +1,290 @@
+{% extends "base.html" %}
+{% block title %}Interview — Interview Bot{% endblock %}
+{% block content %}
+
+<!-- Setup Screen -->
+<div id="setupScreen" style="max-width:540px;margin:0 auto;">
+  <div style="margin-bottom:1.5rem;">
+    <h2 style="font-size:1rem;font-weight:600;">Configure Interview</h2>
+    <p class="muted">Answers are saved automatically when you finish.</p>
+  </div>
+
+  <div class="card">
+    <div class="field">
+      <label>Job Role</label>
+      <input type="text" id="jobRole" placeholder="e.g. Backend Engineer, Data Scientist" value="Software Engineer"/>
+    </div>
+    <div class="grid2">
+      <div class="field">
+        <label>Experience Level</label>
+        <select id="experience">
+          <option value="junior">Junior (0–2 yrs)</option>
+          <option value="mid" selected>Mid (2–5 yrs)</option>
+          <option value="senior">Senior (5+ yrs)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Test Type</label>
+        <select id="testType">
+          <option value="technical">Technical</option>
+          <option value="hr">HR / Behavioural</option>
+          <option value="mixed" selected>Mixed</option>
+          <option value="system design">System Design</option>
+          <option value="data structures">DSA</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Number of Questions</label>
+      <select id="totalQ">
+        <option value="4">4</option>
+        <option value="6" selected>6</option>
+        <option value="8">8</option>
+        <option value="10">10</option>
+      </select>
+    </div>
+    <button class="btn btn-primary btn-full" id="startBtn" onclick="startInterview()">
+      Start Interview
+    </button>
+  </div>
+</div>
+
+<!-- Interview Screen -->
+<div id="interviewScreen" class="hidden" style="max-width:580px;margin:0 auto;">
+
+  <div class="row" style="margin-bottom:.85rem;justify-content:space-between;">
+    <span class="muted" id="progTxt" style="font-size:.8rem;">1 / 6</span>
+    <span class="pill pill-medium" id="diffPill">Medium</span>
+  </div>
+  <div style="height:2px;background:var(--border);border-radius:99px;margin-bottom:.85rem;overflow:hidden;">
+    <div id="barFill" style="height:100%;background:var(--accent);border-radius:99px;width:0%;transition:width .4s;"></div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;">
+      <div style="flex:1;">
+        <span class="lbl">Question</span>
+        <div id="questionText" style="font-size:.97rem;line-height:1.65;">Loading…</div>
+      </div>
+      <button class="btn btn-sm" onclick="replayAudio()">↺</button>
+    </div>
+    <p class="muted" id="statusLine" style="font-size:.76rem;margin-top:.45rem;min-height:1rem;"></p>
+  </div>
+
+  <div class="card">
+    <span class="lbl">Your Answer</span>
+    <div style="text-align:center;padding:.8rem 0 .4rem;">
+      <button class="mic-ring" id="micBtn" onclick="handleMic()">🎙</button>
+      <p class="muted" id="micHint" style="font-size:.74rem;margin-top:.45rem;">Click to speak</p>
+    </div>
+    <div style="display:flex;gap:.5rem;margin-top:.9rem;">
+      <input type="text" id="textIn" placeholder="Or type your answer and press Enter"/>
+      <button class="btn" onclick="submitTyped()">Send</button>
+    </div>
+    <div id="loader" style="display:none;font-size:.78rem;color:var(--muted);margin-top:.7rem;">
+      <span class="dots"><span></span><span></span><span></span></span> Analysing…
+    </div>
+    <div id="analysisSection" class="hidden">
+      <hr class="divider"/>
+      <p id="transcriptBox" style="font-size:.81rem;color:var(--muted);font-style:italic;line-height:1.55;"></p>
+      <div id="chips" style="display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.6rem;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Feedback Screen -->
+<div id="feedbackScreen" class="hidden" style="max-width:540px;margin:0 auto;">
+  <div class="card">
+    <span class="lbl">Interview Complete</span>
+    <div style="margin-bottom:.8rem;">
+      <span id="finalScore" style="font-size:2rem;font-weight:700;">—</span>
+      <span class="muted" style="font-size:.8rem;"> / 10 avg</span>
+    </div>
+    <p id="feedbackText" style="font-size:.88rem;line-height:1.7;"></p>
+    <div class="row mt1">
+      <button class="btn btn-sm" onclick="replayAudio()">↺ Replay</button>
+      <a href="{{ url_for('user_dashboard') }}" class="btn btn-sm btn-primary">View Dashboard</a>
+    </div>
+  </div>
+</div>
+
+<audio id="botAudio"></audio>
+
+<style>
+  .mic-ring {
+    width:62px;height:62px;border-radius:50%;
+    border:1px solid var(--border);background:var(--white);
+    font-size:1.45rem;cursor:pointer;
+    display:inline-flex;align-items:center;justify-content:center;
+    transition:border-color .2s,box-shadow .2s;
+  }
+  .mic-ring:hover { border-color:#aaa; }
+  .mic-ring.listening {
+    border-color:var(--red);
+    box-shadow:0 0 0 5px rgba(207,34,46,.1);
+    animation:pulse 1.3s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100%{box-shadow:0 0 0 5px rgba(207,34,46,.1)}
+    50%{box-shadow:0 0 0 12px rgba(207,34,46,.02)}
+  }
+  .chip {
+    font-size:.68rem;font-weight:500;padding:.18rem .55rem;
+    border-radius:99px;border:1px solid var(--border);
+    background:var(--bg);color:var(--muted);
+  }
+  .chip.pos{color:var(--green);border-color:var(--green);background:#f0fff4;}
+  .chip.neg{color:var(--red);border-color:var(--red);background:#fff5f5;}
+  .chip.neu{color:var(--amber);border-color:var(--amber);background:#fffbea;}
+  .dots{display:inline-flex;gap:3px;vertical-align:middle;margin-right:4px;}
+  .dots span{width:5px;height:5px;border-radius:50%;background:var(--muted);animation:db .9s ease-in-out infinite;}
+  .dots span:nth-child(2){animation-delay:.15s;}
+  .dots span:nth-child(3){animation-delay:.3s;}
+  @keyframes db{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+</style>
+
+<script>
+let sessionId = null, currentAudio = null, busy = false;
+const $ = id => document.getElementById(id);
+
+function playAudio(url) {
+  currentAudio = url;
+  const a = $("botAudio");
+  a.src = url;
+  setStatus("Speaking…");
+  a.onended = () => setStatus("");
+  a.onerror = () => setStatus("");
+  a.play().catch(() => setStatus(""));
+}
+function replayAudio() { if (currentAudio) playAudio(currentAudio); }
+function setStatus(msg) { $("statusLine").textContent = msg; }
+
+function setProgress(num, total, diff) {
+  $("progTxt").textContent = `${num} / ${total}`;
+  $("barFill").style.width = `${(num/total)*100}%`;
+  const p = $("diffPill");
+  p.className = `pill pill-${diff}`;
+  p.textContent = diff[0].toUpperCase() + diff.slice(1);
+}
+
+async function startInterview() {
+  const role = $("jobRole").value.trim();
+  if (!role) { alert("Please enter a job role."); return; }
+  $("startBtn").disabled = true;
+  $("startBtn").textContent = "Starting…";
+  try {
+    const res  = await fetch("/api/start", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
+        job_role:   role,
+        experience: $("experience").value,
+        test_type:  $("testType").value,
+        total_q:    $("totalQ").value,
+      }),
+    });
+    const data = await res.json();
+    if (data.error) { alert(data.error); $("startBtn").disabled=false; $("startBtn").textContent="Start Interview"; return; }
+    sessionId = data.session_id;
+    $("setupScreen").classList.add("hidden");
+    $("interviewScreen").classList.remove("hidden");
+    $("questionText").textContent = data.question;
+    setProgress(1, data.total_q, data.difficulty);
+    playAudio(data.audio_url);
+  } catch(e) {
+    alert("Cannot connect. Is app.py running?");
+    $("startBtn").disabled=false; $("startBtn").textContent="Start Interview";
+  }
+}
+
+async function handleMic() {
+  if (busy) return;
+  busy = true;
+  const btn=$("micBtn"), hint=$("micHint");
+  btn.classList.add("listening"); btn.textContent="⏹";
+  hint.textContent="Listening on your computer mic… speak now";
+  setStatus("Recording…");
+  $("botAudio").pause();
+  try {
+    const res  = await fetch("/api/record", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({session_id:sessionId}),
+    });
+    const data = await res.json();
+    btn.classList.remove("listening"); btn.textContent="🎙";
+    if (data.error) { hint.textContent=data.error; setStatus(""); busy=false; return; }
+    hint.textContent="Processing…";
+    await submitAnswer(data.transcription);
+  } catch(e) {
+    btn.classList.remove("listening"); btn.textContent="🎙";
+    hint.textContent="Error — try again or type below";
+    setStatus(""); busy=false;
+  }
+}
+
+async function submitTyped() {
+  const text=$("textIn").value.trim();
+  if (!text||busy) return;
+  $("textIn").value=""; busy=true;
+  await submitAnswer(text);
+}
+$("textIn").addEventListener("keypress", e=>{ if(e.key==="Enter") submitTyped(); });
+
+async function submitAnswer(text) {
+  $("loader").style.display="block";
+  $("micBtn").disabled=true;
+  setStatus("Analysing…");
+  try {
+    const res  = await fetch("/api/answer", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({session_id:sessionId, text}),
+    });
+    const data = await res.json();
+    $("loader").style.display="none";
+    if (data.error) { alert(data.error); resetUI(); return; }
+    $("analysisSection").classList.remove("hidden");
+    $("transcriptBox").textContent=`"${data.transcription}"`;
+    renderChips(data.analysis);
+    if (data.finished) showFeedback(data);
+    else {
+      $("questionText").textContent=data.next_question;
+      setProgress(data.question_num, data.total_q, data.difficulty);
+      playAudio(data.audio_url);
+      resetUI();
+    }
+  } catch(e) {
+    $("loader").style.display="none";
+    alert("Network error."); resetUI();
+  }
+}
+
+function resetUI() {
+  $("micBtn").disabled=false;
+  $("micHint").textContent="Click to speak";
+  setStatus(""); busy=false;
+}
+
+function renderChips(a) {
+  if (!a) return;
+  const cls={positive:"pos",negative:"neg",neutral:"neu",
+    confident:"pos",nervous:"neg",confused:"neg",enthusiastic:"pos",unsure:"neu",
+    low:"pos",medium:"neu",high:"neg"};
+  const items=[
+    {label:a.sentiment,   key:a.sentiment},
+    {label:a.emotion,     key:a.emotion},
+    {label:`score: ${a.quality_score}/10`, key:a.quality_score>=7?"positive":a.quality_score>=5?"neutral":"negative"},
+    {label:`plagiarism: ${a.plagiarism_risk}`, key:a.plagiarism_risk},
+  ];
+  $("chips").innerHTML=items.map(i=>`<span class="chip ${cls[i.key]||''}">${i.label}</span>`).join("");
+}
+
+function showFeedback(data) {
+  $("interviewScreen").classList.add("hidden");
+  $("feedbackScreen").classList.remove("hidden");
+  const target=parseFloat(data.avg_score)||0;
+  let cur=0; const el=$("finalScore");
+  const t=setInterval(()=>{ cur=Math.min(cur+.2,target); el.textContent=cur.toFixed(1); if(cur>=target) clearInterval(t); },30);
+  $("feedbackText").textContent=data.feedback;
+  playAudio(data.audio_url);
+}
+</script>
+{% endblock %}

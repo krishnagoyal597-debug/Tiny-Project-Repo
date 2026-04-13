@@ -1,0 +1,102 @@
+{
+  "user": {
+    "id": 2,
+    "name": "Arpit Sharma",
+    "email": "arpitshagra@gmail.com",
+    "password": "31a411bef61950e92b32cb8a3be31ddfa4d6ed15b59364fd5591c504f915eba0",
+    "phone": "+919837376787",
+    "college": "GLA University",
+    "target_company": "Google",
+    "role": "user",
+    "created_at": "2026-04-12 10:48:41"
+  },
+  "recommendation": "you are perfect \r\n",
+  "interviews": [
+    {
+      "id": 1,
+      "user_id": 2,
+      "job_role": "Software Engineer",
+      "experience": "mid",
+      "test_type": "mixed",
+      "avg_score": 7.8,
+      "history": [
+        {
+          "question": "Can you explain the trade-offs between monolithic architecture and microservices architecture in software design, and provide an example of when you would choose one over the other?",
+          "answer": "Monolithic architecture is a single unified codebase\u2014simple to build, test, and deploy, making it ideal for small projects or early-stage products. However, it becomes harder to scale and maintain as it grows.  Microservices architecture splits the application into independent services\u2014each can be developed, deployed, and scaled separately. It offers flexibility and scalability but adds complexity in communication, deployment, and monitoring.  Example: I would choose a monolith for an MVP or small app to move fast, and microservices for a large-scale platform like an e-commerce system where different modules (payments, users, orders) need independent scaling and development.",
+          "analysis": {
+            "sentiment": "neutral",
+            "emotion": "confident",
+            "quality_score": 6,
+            "quality_reason": "The answer is clear and concise but lacks originality due to repetition.",
+            "plagiarism_risk": "high",
+            "next_difficulty": "medium",
+            "done": false,
+            "next_question": "How do you approach debugging a complex issue in a distributed system?",
+            "brief_acknowledgement": "Your answer is noted, let's move on to the next question."
+          }
+        },
+        {
+          "question": "How do you approach debugging a complex issue in a distributed system?",
+          "answer": "When debugging a distributed system, I follow a structured approach:  Reproduce the issue \u2013 Identify when and where it occurs. Check logs and metrics \u2013 Use centralized logging and monitoring to trace errors across services. Trace requests \u2013 Follow the request flow using distributed tracing to locate the failing service. Isolate components \u2013 Narrow down which service or dependency is causing the issue. Check recent changes \u2013 Look at deployments, config changes, or updates that might have triggered it. Test fixes incrementally \u2013 Validate the solution in a controlled environment before deploying.",
+          "analysis": {
+            "sentiment": "neutral",
+            "emotion": "confident",
+            "quality_score": 8,
+            "quality_reason": "The answers demonstrate a clear understanding of software engineering concepts and a structured approach to debugging.",
+            "plagiarism_risk": "low",
+            "next_difficulty": "hard",
+            "done": false,
+            "next_question": "How do you ensure the security and integrity of data in a cloud-based system, and what measures would you take to prevent common web application vulnerabilities?",
+            "brief_acknowledgement": "Your answers so far have been very informative."
+          }
+        },
+        {
+          "question": "How do you ensure the security and integrity of data in a cloud-based system, and what measures would you take to prevent common web application vulnerabilities?",
+          "answer": "o ensure data security and integrity in a cloud-based system, I use a layered approach:  Encryption: Encrypt data both at rest and in transit (e.g., HTTPS, TLS). Access control: Implement strong authentication (MFA) and role-based access control (RBAC). Regular backups & integrity checks: Ensure data can be recovered and hasn\u2019t been tampered with. Monitoring & logging: Continuously track access and detect suspicious activity.  To prevent common web vulnerabilities:  Input validation & sanitization \u2192 prevents SQL Injection and XSS Use secure authentication \u2192 hashed passwords (bcrypt), session management CSRF protection \u2192 tokens for sensitive requests Security headers \u2192 like CSP, HSTS Keep dependencies updated \u2192 avoid known vulnerabilities",
+          "analysis": {
+            "sentiment": "positive",
+            "emotion": "confident",
+            "quality_score": 8,
+            "quality_reason": "The candidate provided detailed and relevant answers to the questions, demonstrating a strong understanding of software engineering concepts.",
+            "plagiarism_risk": "low",
+            "next_difficulty": "hard",
+            "done": false,
+            "next_question": "Can you describe a situation where you had to optimize the performance of a slow database query, and how you went about it?",
+            "brief_acknowledgement": "You're doing great, let's move on to the next question."
+          }
+        },
+        {
+          "question": "Can you describe a situation where you had to optimize the performance of a slow database query, and how you went about it?",
+          "answer": "In one project, I noticed a database query was slowing down the application response time.  First, I analyzed the query using EXPLAIN to understand how the database was executing it. I found it was doing a full table scan.  Then I:  Added appropriate indexes on frequently filtered columns Optimized the query by removing unnecessary joins and selecting only required fields Normalized/structured data better where needed In some cases, used caching for repeated queries  After optimization, the query execution time reduced significantly.  Key idea: Identify the bottleneck using tools, then optimize with indexing, query refinement, and efficient data access.",
+          "analysis": {
+            "sentiment": "positive",
+            "emotion": "confident",
+            "quality_score": 8,
+            "quality_reason": "The candidate provided detailed and relevant answers to the questions.",
+            "plagiarism_risk": "low",
+            "next_difficulty": "hard",
+            "done": false,
+            "next_question": "How do you handle errors and exceptions in a distributed system, and what strategies do you use to ensure fault tolerance?",
+            "brief_acknowledgement": "You're doing great, let's move on to the next question."
+          }
+        },
+        {
+          "question": "How do you handle errors and exceptions in a distributed system, and what strategies do you use to ensure fault tolerance?",
+          "answer": "In a distributed system, I handle errors by designing for failure from the start:  Centralized logging & monitoring to quickly detect and trace errors across services Graceful error handling with meaningful responses instead of system crashes Retries with backoff for transient failures (e.g., network issues) Circuit breakers to stop repeated calls to failing services  For fault tolerance:  Redundancy & replication so failure of one instance doesn\u2019t stop the system Load balancing to distribute traffic and avoid overload Timeouts & fallbacks to prevent cascading failures Data backups & recovery mechanisms",
+          "analysis": {
+            "sentiment": "positive",
+            "emotion": "confident",
+            "quality_score": 9,
+            "quality_reason": "The candidate provided detailed and relevant answers to all questions, demonstrating a strong understanding of software engineering concepts.",
+            "plagiarism_risk": "low",
+            "next_difficulty": "hard",
+            "done": true,
+            "next_question": "",
+            "brief_acknowledgement": "You have completed the interview."
+          }
+        }
+      ],
+      "created_at": "2026-04-12 10:53:09"
+    }
+  ]
+}
